@@ -89,7 +89,7 @@ pH <- ggplot(data=wine, aes(x= pH)) +
 sulphates <- ggplot(data=wine, aes(x= sulphates)) +
   geom_histogram(bins=20, color="black", fill="light blue")
 alcohol <- ggplot(data=wine, aes(x= alcohol)) +
-  geom_histogram(bins=20, color="black", fill="light blue")
+  geom_histogram(bins=20, color="black", fill="light blue") 
 
 ggarrange(fa, va, ca, rs, ch, fSO2, tSO2, density, pH, sulphates, alcohol, 
           ncol = 4, nrow = 3)
