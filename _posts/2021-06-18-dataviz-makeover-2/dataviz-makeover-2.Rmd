@@ -1,0 +1,412 @@
+---
+title: "DataViz Makeover 2"
+description: |
+  Interactive visualisation for Singapore's Merchandise Trade with its Trading Partners, 2011-2020
+author:
+  - name: Connie Xia
+    url: https://example.com/conniexia
+date: 06-18-2021
+output:
+  distill::distill_article:
+    self_contained: false
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+# 1. Critique of Original Data Visualisation
+
+![](img/original.jpg)
+
+The original data visualisation is evaluated for its clarity and aesthetics as follows:
+
+## 1.1. Clarity
+
+S/N | Critiques | Suggestions 
+-- | ---------------- | ----------------
+1 | **Absence of a title** – Without a title, it is difficult for the viewers to understand what exactly the data visualisation is about. | Suggest to include an appropriate title like *Merchandise Trade Performance with Singapore's Trade Partners* at the top of the data visualisation.
+2 | **Axis labels are not clear** - Both axes are labelled from 0 to 80 without specifying the measurement or units of the values. Upon scrutinisation, it is revealed from the call-outs that the values are measured in billions and have a monetary value. | Suggest to add in the units (S$B) in the axis titles or standardise the measurements so that the actual raw values are reflected on the axis labels.
+3 | **Net trade values with each trading partner are unclear** - Under the notes, it is revealed that if the value of imports exceed exports, the centre point (white circle) of the bubble will fall in the "Net Importers" section that is shaded blue; and if the value of exports exceed imports, the white circle will fall in the "Net Exporters" section that is shaded green. However, as all the bubbles have full opacity and some bubbles are covered by other bubbles, it is unclear to tell what exactly the trade balance is. | Suggest to use a red-blue diverging colour scheme to reflect the net trade balance: Red to mean trade deficit and Blue to mean trade surplus, so that it would be clearer to determine which trading partners are Singapore's net importers and exporters respectively.
+4 | **Lack of direct link between the written observation and the bubble plot** - The observation at the bottom of the visualisation compared Singapore's trade values with its trading partners across different time periods, which is not explicitly shown in the bubble plot. THe is no time aspect revealed from the bubble plot. | Suggest to include in the time component in the visualisation, making it an interactive one.
+
+## 1.2. Aesthetics
+
+S/N | Critiques | Suggestions 
+-- | ---------------- | ----------------
+1 | **Overuse of colours in the data visualisation** – Colours should be used to serve a particular purpose like highlighting a particular meaning in data. Yet in this case, the usage of ten different colours to represent the ten different trading partners adds no meaning to the data visualisation. | It is perhaps more applicable to stick to a diverging colour scheme to show Singapore's export and import values with each trading partner's export and import on the bubble plot instead of using a colour to represent each trading partner. 
+2 | **Size of bubbles of bubble plot are too large** - Although bubble size is used to show the total merchandise trade value with the respective trade partnenrs, the bubble sizes seem to be too large, making the entire plot look very cluttered. | Suggest to reduce the size of the bubbles accordingly so as to prevent over-cluttering of the bubble plot. 
+3 | **Location of the axis titles might be confusing** - Both the y-axis and x-axis titles are located at the bottom and left of origin of the plot respectively, which is an uncommon and confusing way to label the axes titles. Without the colour guide, one may accidentally read the axes the other way round due to the positioning of the axes titles. | Suggest to adopt the default way of labelling the axis title, which is having the y-axis title as a rotated title on the left of the y-axis and the x-axis title below of the x-axis.
+4 | **Absence of axis markers on the plot** - Tick marks are not present on the bubble plot, making it difficult to figure out the exact positions of the values and determine the corresponding export and import values. | Suggest to add in major tick marks of appropriate darkness since both axes are in continuous scale. 
+
+
+# 2. Proposed Design
+
+Based on the critics raised above, an alternative graphical presentation has been sketched out to improve the current design. 
+
+![](img/new.jpg)
+
+## 2.1. Advantages of the Proposed Design
+
+The advantages of the proposed design are as follows.
+
+### Clarity
+
+S/N | Design | Advantages 
+-- | ---------------- | ----------------
+1 | **Clear title and subtitles** | The title and subtitle gives an overaching theme of what the visualisation is about. 
+2 | **Axis markers are clearly labelled** | Axis markers for the bubble plot are denominated in billion dollars for easily understanding of what the axes represents 
+3 | **Addition of animation and filters for interactivity** | Filters and animation are included for Years, Trade Partners and Region/Market in this design to be able to toggle around, customising different views to one's liking, as well as to avoid the problem of overcrowding.
+4 | **Tooltips are used to include in added insights** | THe usage of tooltips can effectively and directly point out observations. Another bar chart is embedded in the tooltip to showcase the balance of trade with each individual trading partners over the span of 10 years.  
+5 | **Reference lines are added** | The demarcation of reference lines is used to compare the data values displayed on the bubble plot with the calculated average. 
+
+### Aesthestics
+
+S/N | Design | Advantages 
+-- | ---------------- | ----------------
+1 | **Effective use of colours** | Colours are only used to represent trade surplus and trade deficit, to bring about a cleaner visualisation.
+2 | **Bubble sizes are adjusted accordingly** | Bubble sizes are set in a way that isn't too large or too small, so that it can be seen clearly, at the same time not overcrowdinb the entire plot. 
+3 | **Axes titles are positioned clearly ** | The default settings of the axis label on the side of the y-axis and bottom of the x-axis, makes it easy for the viewers to read and understand as it is the most conventional way of labelling the axes.  
+4 | **Axis markers are added for continuous data** | Major tickmarks point to us the exact point on the axis that the axis label defines.
+
+
+# 3. Proposed Visualisation
+
+The alternative static visualisation is created using Tableau Desktop and is uploaded onto Tableau Public [here](https://public.tableau.com/app/profile/connie.xia/viz/DataVizMakeover2_16241926546890/Dashboard1).
+
+
+# 4. Step-by-step Guide
+
+## 4.1. Data Used
+
+Two data sources are used which are available under the sub-section of [Merchandise Trade by Region/Market](https://www.singstat.gov.sg/find-data/search-by-theme/trade-and-investment/merchandise-trade/latest-data) on the DOS website. The two datasets are then all downloaded and saved as *outputFile.xlsx*.
+
+After opening the *outputFile* in Excel, we can see that there are three sheets: Content, T1 and T2. The *Content* sheet is basically a content page for the datasets found in the Excel file. T1 shows all *Merchandise Imports By Region/Market, Monthly* and T2 shows all *Merchandise Exports By Region/Market, Monthly*.
+
+## 4.2. Data Preparation
+
+**Step 1**: Import the data in Tableau Desktop by dragging and dropping the *outputFile* onto the Tableau Start Page. 
+
+**Step 2**: Check the *Use Data Interpreter* box to help identify the structure of the data and help in our data cleaning and manipulation.
+
+![](img/dataprep1.png)
+
+**Step 3**: Drag and drop *T1* onto the Tableau workspace. 
+
+As we have made use of the Data Interpreter to help us understand the data structure, the data will be nicely reflected in a tabular form.
+
+![](img/dataprep2.png)
+
+**Step 4**: Filter the data by the trading partners to exclude *Total Merchandise Imports*. 
+
+Click on the *Add*  Filter button on the top right of the pane. A new window will pop up and select the *Add* button. Scroll all the way around and select *Variables* before clicking *OK*. Another window will show and make sure all the checkboxes are checked, with the exception of *Total Merchandise Imports(Thousand Dollars)*.
+
+![](img/dataprep3.png)
+
+
+**Step 5**: Rename the *Variables* header to *Trading Partners* by double-clicking on the *Variables* word. 
+
+![](img/dataprep4.png)
+
+**Step 6**: Pivot the table by selecting all the time period columns and right click to choose *Pivot*.
+
+![](img/dataprep5.png)
+
+**Step 7**: Rename the *Pivot Field Names* and *Pivot Field Values* to *Time Period* and *Import Value* respectively.
+
+![](img/dataprep6.png)
+
+**Step 8**: Change the data type of the *Time Period* column from *string* data type to *Date*. 
+
+To do so, click on the icon on the top left of the column header and choose *Date*. 
+
+![](img/dataprep7.png)
+
+**Step 9**: Filter the data by *Time Period* to only include in data from January 2011 to December 2020. 
+
+Click on the *Edit* Filter button on the top right of the pane, before adding another filter. Choose *Time Period* and select *Year* to pick Years *2011 to 2020* to keep.
+
+![](img/dataprep8.png)
+
+**Step 10**: Export the file as a *csv* file under Data > Export Data as CSV > T1 and save it as Imports_data.csv.
+
+![](img/dataprep9.png)
+
+**Step 11**: Repeat steps 3 to 10 for T2 and save the file as Exports_data.csv. 
+
+**Step 12**: In a new Tableau workspace, drag and drop in the *Imports_data.csv* file. 
+
+At the left pane, we can see both the *Imports_data.csv* and *Exports_data.csv* files. Drag and drop the *Imports_data.csv* node into the workspace. 
+
+![](img/dataprep10.png)
+
+**Step 13**: Merge the two *Imports_data.csv* and *Exports_data.csv* files. 
+
+To do so, double click on the *Import_data.csv* node in the workspace and drag the *Export_data.csv* node into the workspace. Then, click on the Venn diagram between the two nodes and make sure the *Inner* join is selected. Join the two datasets by *Time Period* and *Trading Partners* before closing the callout box. 
+
+![](img/dataprep11.png)
+
+**Step 14**: The two duplicated columns: *Time Period (Exports data.csv)* and *Trading Partners (Exports data.csv)* can now be hidden. 
+
+Select the two columns and click on the small triangle located on the top right of the column header and select *Hide*. 
+
+![](img/dataprep12.png)
+
+**Step 15**: The *Trading Partners* column is then split into two new columns showing the **name** of the trading partner and the **units of measurement** for the trade data. 
+
+Click on the small triangle located on the top right of the column header again and this time, choose *Split*.
+
+![](img/dataprep13.png)
+
+**Step 16**: The new columns *Trading Partners - Split 1* and *Trading Parters - Split 2* are then renamed to *Trade Partners* and *Units* respectively by double-clicking on the header names and typing in the new header names.
+
+![](img/dataprep14.png)
+
+**Step 17**: Create a new *Calculated Field* for the *Import Value* to scale and synchronise the values accordingly as some values are reflected in *millions* and others in *thousands*. 
+
+Right click on the *Imports Value* and select *Create Calculated Field* and add in the following formula to compute the raw values of the imports. Rename the field as *Imports*.
+
+![](img/dataprep15.png)
+
+**Step 18**: Repeat Step 16 to create a new *Calculated Field* for the *Export Value* too and rename the field as *Exports*.
+
+**Step 19**: Now, we can hide the *Trading Partners*, *Unit*, *Export Value* and *Import Value* columns.
+
+![](img/dataprep16.png)
+
+**Step 20**: Create a new *Calculated Field* called *Trade Balance* to derive Singapore's trade balance with its trading partners with the following formula. 
+
+![](img/dataprep17.png)
+
+**Step 21**: Create a new *Calculated Field* called *Total Trade* to derive the total merchandise trade Singapore has with its trading partners with the following formula. 
+
+![](img/dataprep18.png)
+
+With that, the basic cleaning and data manipulation of Singapore's merchandise trade dataset is completed and we can now move on to the data visualisation part. 
+
+
+## 4.3. Data Visualisation
+
+**Step 1**: Click on the *Sheet 1* on the bottom of the Tableau Workspace and be directed to the visualisation workspace. 
+
+![](img/dataviz1.png)
+
+**Step 2**: Drag and drop the *Exports* and *Imports* nodes into the *Columns* and *Rows* respectively, to arrive at the following graph.
+
+![](img/dataviz2.png)
+
+**Step 3**: Drag and drop the *Trade Partners* node into the *Details* box to see the distribution of Singapore's trading partners in terms of exports and imports. 
+
+![](img/dataviz3.png)
+
+**Step 4**: Drag and drop the *Trade Partners* node into the *Filter* pane and click OK. 
+
+![](img/dataviz4.png)
+
+**Step 5**: Click on the small triangle on the side of the *Trade Partners* to reveal a dropdown box. 
+
+Select on *Show Filter* to make the check box filter appear on the right side of the workspace. Filter the trading partners to only show **European Union**, **Hong Kong**, **Indonesia**, **Japan**, **Mainland China**, **Malaysia**, **Republic Of Korea**, **Taiwan**, **Thailand** and the **United States** to focus on these trading partners first. As this is going to be an interactive visualisation, we can always choose different trading partners from the Filter bar to look at their results.  
+
+![](img/dataviz5.png)
+
+**Step 6**: Drag and drop the *Total Trade* node into the *Size* box, so that the size of the circles reflect the total merchandise trade Singapore has with its respective trading partners. 
+
+Click on the *Size* box to adjust the size of the circles accordingly by dragging the slider. 
+
+![](img/dataviz6.png)
+
+**Step 7**: Change the graph type from *Automatic* to *Circle* to show a bubble plot with shaded bubbles. 
+
+![](img/dataviz7.png)
+
+**Step 8**: Drag and drop the *Trade Balance* node to the *Color* box to show the net trade with each trading partner. 
+
+Click on the *Color* box and choose a light grey border for the bubbles under Effects > Border. Under *Edit Colors*, select the *Red-Blue Diverging* colour palette in the drop down box. Check *Use Full Color Range*. Under *Advanced* settings, make sure that the *Center* check box is ticked and the center is set at 0. Apply the settings and click OK. 
+
+![](img/dataviz8.png)
+
+**Step 9**: Drag and drop the *Trade Partners* node to the *Label* box, so that the names of the trade partners will be shown on the bubble plot for easy reference. 
+
+![](img/dataviz9.png)
+
+**Step 10**: Add in axis lines and tick marks. 
+
+Right click on the x-axis and select *Format*. The *Format* pane will appear on the left of the workspace. Under the *Axis* pane and *Scale* tab, select the drop down box at *Numbers* and choose *Currency (Custom)*. Make the decimal places = 0 and display units as Billions (B). Do the exact same for the y-axis as well. 
+
+Click on the *Lines* tab at the top of the Format pane to be directed to the *Format Lines* pane. At the *Sheet* tab, add in light grey markers for the *Axis Rulers* and the *Axis Ticks*.
+
+![](img/dataviz10.png)
+
+**Step 11**: Add in references lines on both the y-axis and x-axis to reflect the average imports and exports values. 
+
+Right click on the x-axis and select *Add Reference Line*. A pop up will appear and select *Average* in the drop down box and *Custom* as the label. Type in "Avg exports = " before pressing on the arrow button at the side to choose *Value*. 
+
+Under the *Formatting* section, click on the drop down box for *Line*. Choose the first *Dotted Line* and select the line thickness to be the thinnest. Use a light grey colour for the line. 
+
+Repeat the same to add in a reference line on the y-axis as well to show the average imports. 
+
+![](img/dataviz11.png)
+
+**Step 12**: Create a new *Calculated Field* to add in a *Ranking by Net Exports*. 
+
+Right click on the left pane and select *Create Calculated Field*. Type in the following formula to rank the trading partners by their *Net Exports* to Singapore. 
+
+![](img/dataviz12.png)
+
+**Step 13**: Similarly, create another new *Calculated Field* to add in a *Ranking by Net Imports*.
+
+Right click on the left pane and select *Create Calculated Field*. This time, type in the similar formula as above but change 'desc' to 'asc' instead, to rank the trading partners by their *Net Imports* to Singapore.
+
+![](img/dataviz13.png)
+
+**Step 14**: Drag and drop both *Ranking by Net Exports* and *Ranking by Net Imports* into the *Tooltip* box. 
+
+![](img/dataviz14.png)
+
+**Step 15**: Next, click on the small triangle on the corner of the *Ranking by Exports* icon and select *Compute Using* > *Trade Partners* to be rank the export values by the trading partners.
+
+Do the same for the *Ranking by Imports* to sort the ranking by trading partners. 
+
+![](img/dataviz17.png)
+
+**Step 16**: Now, when we mouse over the bubbles, we can see a call out box showing the *Trade Partner*, *Imports*, *Exports*, *Trade Balance*, *Total Trade* and both *net imports' and exports' rankings*. We can see that the values for the *Trade Balance* and *Total Trade* are in their raw forms. So, it would be wise to standardised them to reflect their values in billions. 
+
+![](img/dataviz15.png)
+
+**Step 17**: In order to do so, click on the small triangle on the corner of the *SUM(Trade Balance)* icon and select *Format*. The *Format* pane will appear on the left. At the *Pane* tab, under the *Default* section, choose *Currency (Custom)* under the *Numbers* drop down box, and set the decimal places to 2 and display units as Billions (B).  
+
+![](img/dataviz16.png)
+
+**Step 18**: Do the same to adjust for the Total Trade, at the *SUM(Total Trade)* icon. 
+
+**Step 19**: Add two new *Calculated Fields* called *Net Exports* and *Net Imports* to pull out Singapore's trade surplus and trade deficit respectively, with its trading partners. 
+
+Right click to add a *Calculated Field* and type in the following formulas. 
+
+![](img/dataviz18.png)
+
+**Step 20**: Drag and drop the *Net Exports* and *Net Imports* nodes into the *Tooltip* box. 
+
+Scale the numbers to reflect the trade values in Billions. Click on the small triangle at the corner of the *AGG(Net Imports)* and *AGG(Net Exports)* icons and select *Format*. Under the *Pane* tab, adjust the numbers such that their decimal places are 2 and  display units are in Billions (B).
+
+![](img/dataviz19.png)
+
+**Step 21**: Once that is done, we can now rewrite the message to be shown in the Tooltip. Click on the *Tooltip* button and recraft the wordings as follows.
+
+![](img/dataviz20.png)
+
+**Step 22**: Drag and drop the *Time Period* node into the *Filter* box. Select *Years* in the new pop up window and click *Next*. Click OK.
+
+![](img/dataviz21.png)
+
+**Step 23**: Click on the small triangle at the *YEAR(Time Period)* node and select *Show Filter*.
+
+![](img/dataviz22.png)
+
+**Step 24**: At the *YEAR(Time Period)* pane located at the right of the workspace, click on the small triangle and from the drop down list, choose *Single Value (list)* to activate the radio button option to choose from the Year list.
+
+![](img/dataviz23.png)
+
+**Step 25**: Next, ensure that the *Show "All" Value* option is unchecked. 
+
+To do so, click on the small triangle at the *YEAR(Time Period)* pane again. Under *Customise*, uncheck the *Show "All" Value* option.
+
+![](img/dataviz24.png)
+
+**Step 26**: Now, in a new Sheet, drag and drop *Time Period* and *Trade Balance* into the *Columns* and *Rows*, respectively.
+
+![](img/dataviz25.png)
+
+**Step 27**: Change the graph type from *Automatic* to *Bar*. 
+
+![](img/dataviz26.png)
+
+**Step 28**: Increase the *Size* of the bars by dragging the scroll to the right, so as to reduce the gaps between each individual bars. 
+
+![](img/dataviz27.png)
+
+**Step 29**: At the top of the bar chart, right click on the *Time Period* header and select *Hide Field Labels for Columns*.
+
+It is self-explanatory that the categorical variables are in time format, so it is not necessary to include a similar header too. 
+
+![](img/dataviz29.png)
+
+**Step 30**: Drag and drop *Trade Balance* node into the *Color* box and *Edit Colors* by clicking on the small triangle of the *SUM(Trade Balance)* pane, located at the right hand side. Choose a *Red-Blue Diverging* colour palette with 2 stepped colours. Under *Advanced* settings, ensure that the Center is set at 0. 
+
+![](img/dataviz30.png)
+
+**Step 31**: Rename *Sheet 2* to *Annual Trade Balance* by double-clicking on the title.
+
+![](img/dataviz28.png)
+
+**Step 32**: Adjust the axes accordingly by adding in the monetary units of measurement, tick marks and axis line to the y-axis, and the axis line to the x-axis, under the *Format* pane.
+
+Right click on the y-axis and select *Format*. Under the *Format* pane on the left, choose the *Currency (Custom)* option under the *Axis* section and set the decimal places and display units accordingly. 
+
+Click on the *Lines* button to add in *Axis Rulers* and *Axis Ticks*, and choose a grey colour to show on the bar chart. 
+
+![](img/dataviz31.png)
+
+**Step 33**: Resize the bar chart to small as possible as we want to embed this bar chart into the tooltip of our previous visualisation.
+
+![](img/dataviz32.png)
+
+**Step 34**: Rename both *Sheet 1* and *Sheet 2* to *Merchandise Trade Performance* and *Annual Trade Balance* respectively.
+
+**Step 35**: Now, we can go back to *Sheet 1* and add in the bar chart to its *ToolTip*. Click onto the *Tooltip* and select *Insert* > *Sheets* > *Annual Trade Balance* to add in the diagram to the bottom of the *Tooltip*.
+
+![](img/dataviz33.png)
+
+**Step 36**: Mousing over the bubbles will show the *Annual Trade Balance* graph in the tooltip, but the graph is cut. In order to show the entire graph, click on the *Tooltip* button and change the *maxwidth* from 300 to 500. 
+
+![](img/dataviz34.png)
+
+**Step 37**: Change the title to *Singapore's Trade Performance with its Trading Partners*. 
+
+In order to add in an interactive year that changes when different years are picked, click on the *Insert* button and choose *YEAR(Time Period)* to activate the interactivity. 
+
+![](img/dataviz35.png)
+
+**Step 38**: Add a new *Dashboard* and drag and drop the *Merchandise Trade Performance* sheet into the workspace.
+
+![](img/dataviz36.png)
+
+**Step 39**: Under the *Size* section, change from *Fixed size* to *Automatic*, so that the dashboard will automatically adjust itself on different viewing platforms. 
+
+![](img/dataviz37.png)
+
+**Step 40**: Remove the *Total Trade* section from the dashboard.
+
+![](img/dataviz38.png)
+
+**Step 41**: Change the title of the *Year of Time Period* to *Year* by right clicking on the title of the *Year of Time Period* pane and selecting *Edit Title*.
+
+![](img/dataviz39.png)
+
+**Step 42**: Add in animation to smoothen the transition, while toggling between different years.
+
+![](img/dataviz40.png)
+
+**Step 43**: Looking at the data visualisation, it seemed that both the regions and markets are combined in the same bubble plot, making analysis of the visualisation tedious. We can go back to the *Data Source* tab and add in a new *Calculated Field* as follows. As the Singapore's trade values with the different regions are denominated in millions and the country's trade values with different markets are denominated in thousands, we can separate the trading partners in regions and markets easily, with the following formula:
+
+![](img/dataviz41.png)
+
+**Step 44**: Now, go to the *Merchandise Trade Performance* sheet and add in a new filter. Drag the *Region/Market* node into the *Filter* section and show the filter on the right hand of the workspace. Edit the check boxes to radio buttons instead so as to individually toggle between All, Region and Market. 
+
+![](img/dataviz42.png)
+
+**Step 45**: The final visualisation would look something like this after captions regarding the observations are added.
+
+![](img/dataviz43.png)
+
+
+# 5. Major Observations Derived
+
+The major observations derived from new data visualisation are as follows:
+
+1. Looking at Singapore's merchandise trade by markets, we can observe that Hong Kong is Singapore's top net exporter since 2011 and the United States was Singapore's top net importer before it was overtaken by Taiwan from 2018 onwards. However, when we examine Singapore's merchandise trade by region, Asia and Europe has been successful in being Singapore's top net exporter and importer for the past 10 years.
+
+2. The top 10 trading partners of Singapore (in terms of total trade value) are Mainland China, Malaysia, United States, Hong Kong, Taiwan, Japan, Republic of Korea, Indonesia and Thailand, in no particular order. It is interesting to note that Singapore has been in constant trade deficit with Taiwan and Japan over the past 10 years and constant trade surplus with Mainland China, Hong Kong, Indonesia and Thailand. Singapore starts to be in trade deficit with Malaysia since 2019, previously being a net exporter to Malaysia. The country also became in trade surplus with both Republic of Korea and the United States in 2017 and 2020, respectively.  
+
+3. Both average exports and imports out of and into Singapore dropped by approximately 2.75% and 5.85% respectively from 2019 to 2020. This could be due to the COVID-19 pandemic which originated in Wuhan, China in December 2019 and has been on-going. Measures to contain and curb the spread of the virus undoubtedly affecting trade, as shown from the decreased trade value over the year. 
