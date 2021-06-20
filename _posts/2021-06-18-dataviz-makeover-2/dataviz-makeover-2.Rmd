@@ -396,7 +396,7 @@ In order to add in an interactive year that changes when different years are pic
 
 ![](img/dataviz42.png)
 
-**Step 45**: The final visualisation would look something like this after captions regarding the observations are added.
+**Step 45**: The static version of the visualisation would look something like this after captions regarding the observations are added. The interactive visualisation is on [Tableau Public](https://public.tableau.com/app/profile/connie.xia/viz/DataVizMakeover2_16241926546890/Dashboard1).
 
 ![](img/dataviz43.png)
 
