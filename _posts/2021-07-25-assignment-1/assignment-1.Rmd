@@ -347,3 +347,263 @@ knitr::kable(cc_loyalty_data %>%
                dplyr::select(timestamp, weekdayf, location, price, last4ccnum, loyaltynum), 
              caption = "Transactions made with CC 9551")
 ```
+
+## Vehicle Data Analysis
+
+Moving on, we will be analysing the vehicle data alongside with the credit and loyalty card transaction data.
+
+First, the raster file, *M2-tourist.tif*, is imported into R.
+
+```{r}
+bgmap <- raster("./data/MC2-tourist.tif")
+
+```
+
+Next, the vector GIS data file, *Abila*, is imported into R.
+
+```{r}
+Abila_st <- st_read(dsn = "./data/Geospatial",
+                    layer = 'Abila')
+
+```
+
+The vehicle tracking csv data file is also imported into R. 
+
+```{r}
+gps <- read_csv("./data/gps.csv")
+
+glimpse(gps)
+```
+
+After taking a look at the *gps.csv* file, we converted the *Timestamp* field from character data type to date-time format. The *id* field is also converted from numerical data type to factor data type. 
+
+```{r}
+gps$Timestamp <- date_time_parse(gps$Timestamp,
+                                 zone = "",
+                                 format = "%m/%d/%Y %H:%M")
+
+gps$day <- as.factor(get_day(gps$Timestamp))
+
+gps$id <- as.factor(gps$id)
+```
+
+The gps dataframe is converted into a simple feature data frame.
+
+```{r}
+gps_sf <- st_as_sf(gps,
+                   coords = c("long", "lat"),
+                   crs = 4326)
+
+glimpse(gps_sf)
+```
+
+The gps points are then joined together into movement paths by using the drivers' IDs as unique identifier.
+
+```{r}
+gps_path <- gps_sf %>%
+  group_by(id, day) %>%
+  summarise(m = mean(Timestamp),
+            do_union = FALSE) %>%
+  st_cast("LINESTRING")
+
+glimpse(gps_path)
+```
+
+The stationary points of all cars over the span of 2 weeks is plotted on the map below with the blue dots. The car is deeemd to be stationary if it has stopped for more than 3 minutes.
+
+```{r}
+POI <- gps_sf %>%
+  group_by(id) %>%
+  mutate(stoptime = Timestamp - lag(Timestamp)) %>%
+  mutate(parked = ifelse(stoptime > 60*3, TRUE, FALSE)) %>%
+  ungroup() %>%
+  filter(parked == TRUE) %>%
+  group_by(id, day) %>%
+  add_count(id, day, name = "count") %>%
+  ungroup()
+
+POI_sf <- POI %>%
+  filter(parked == TRUE)
+tmap_mode("view")
+
+tm_shape(bgmap) +
+  tm_rgb(bgmap, r = 1,g = 2,b = 3,
+       alpha = NA,
+       saturation = 1,
+       interpolate = TRUE,
+       max.value = 255) +
+  tm_shape(POI_sf) +
+  tm_dots(col = "blue")
+
+```
+
+Going back to the anormalies assessment, we can use the vehicle tracking data to supplement our analysis.
+
+1. The transaction amount made at Frydos Autosupply n’ More on 13 Jan is highly suspicious and needs to be investigated.
+
+The credit card used to make that purchase ends with 9551. Hence, we can pull out all the transactions made on that card on 13 Jan. 
+
+```{r}
+knitr::kable(cc_loyalty_data %>%
+               filter(last4ccnum == 9551 & date == dmy(13012014)) %>%
+               dplyr::select(timestamp, location, price, last4ccnum, loyaltynum) %>%
+               arrange(timestamp), "simple",
+             caption = "Transactions made using CC 9551 on 13 Jan")
+```
+
+On 13 Jan, CC 9551 was used at Daily Dealz, U-Pump, Hippokampos, Frydos and Ouzeri Elian. 
+
+The gps path of all vehicles on 13 Jan is plotted for reference. Looking at the map, we can observe that on 13 Jan, only Car ID 24 made a stop at U-Pump. Hence, it is worth investigating is the owner of the Car ID 24 is the same owner of CC 9551.
+
+
+```{r}
+gps_path_2 <- gps_path %>%
+  filter(day==13)
+tmap_mode("view")
+tm_shape(bgmap) +
+  tm_rgb(bgmap, r = 1,g = 2,b = 3,
+       alpha = NA,
+       saturation = 1,
+       interpolate = TRUE,
+       max.value = 255) +
+  tm_shape(gps_path_2) +
+  tm_lines()
+```
+
+The stationary points of Car ID 24 on 13 Jan are as follows:
+
+```{r}
+knitr::kable(POI_sf %>%
+               filter(id == 24 & day == 13) %>%
+               dplyr::select(id, Timestamp, geometry) %>%
+               arrange(Timestamp), "simple",
+             caption = "GPS Path of Car ID 24 on 13 Jan")
+```
+
+```{r}
+gps_24 <- gps_path %>%
+  filter (day == 13 & id == 24)
+  
+POI_24 <- POI_sf %>%
+  filter(id == 24 & day == 13)
+tmap_mode("view")
+
+tm_shape(bgmap) +
+  tm_rgb(bgmap, r = 1,g = 2,b = 3,
+       alpha = NA,
+       saturation = 1,
+       interpolate = TRUE,
+       max.value = 255) +
+  tm_shape(gps_24) +
+  tm_lines() +
+  tm_shape(POI_24) +
+  tm_dots(col = "blue")
+```
+
+Observations:
+
+* Car ID 24 left U-Pump at 13:22, corresponding to the transaction at U-Pump occurring at 13:18. 
+* The user of Car ID 24 was near the area of Brew've Been Served at 19:29 whereas another transaction was made at Ouzeri Elian at 19:30.
+
+Conclusion: 
+The user of Car ID 24 and the holder of CC 9551 might not be the same person as the card and car records do not match perfectly, making the transactions on CC 9551 very suspicious. We can infer that perhaps the CC 9951 was used by more than one person. 
+
+
+2. The next anormaly is the transactions made during the wee hours at Kronos Mart.
+
+These five different transactions are all made by different credit cards, suggesting that it might be not a habit of an individual who prefers to grocery shop at night.
+
+```{r}
+knitr::kable(cc_loyalty_data %>%
+               filter(location == "Kronos Mart" & hour == "3") %>%
+               dplyr::select(timestamp, location, price, last4ccnum, loyaltynum) %>%
+               arrange(timestamp), "simple",
+             caption = "Transactions made at Kronos Mart during the wee hours")
+```
+
+Looking at the stationary points of the cars on 12, 13 and 19 Jan, we aren't able to point out which car is linked to the credit cards used at the mart. The only stationary points appearing near Kronos Mart are:
+
+* 12 Jan, 13:58 
+* 13 Jan, 13:38
+* 19 Jan, 14:23
+
+These timings all do not coincide with the timings in the wee hours.
+
+```{r}
+POI_midnight <- POI_sf %>%
+  filter(day == c(12, 13, 19))
+tmap_mode("view")
+
+tm_shape(bgmap) +
+  tm_rgb(bgmap, r = 1,g = 2,b = 3,
+       alpha = NA,
+       saturation = 1,
+       interpolate = TRUE,
+       max.value = 255) +
+  tm_shape(POI_midnight) +
+  tm_dots(col = "blue")
+```
+
+Conclusion:
+The credit card holders of 8156, 5407, 3484, 9551 and 8332 either stay a walking distance from the Kronos Mart or they used their own personal cars instead of the company-provide cars to make the travel. 
+
+
+3. Another anormaly has to do with the large transaction occurring at Albert's Fine Clothing and Chostus Hotel. 
+
+Looking at the Albert's Fine Clothing suspicious transaction, we can see that the transaction occurred on 17 Jan at 19:44, using CC 1321 and L4149.
+
+```{r}
+knitr::kable(spending_by_location %>%
+               filter(location %in% "Albert's Fine Clothing") %>%
+               filter(price %in% max(price)) %>%
+               dplyr::select(location, timestamp, date, hour, price, median_price, last4ccnum, loyaltynum), 
+             caption = "Transactions made in Albert's Fine Clothing")
+```
+
+Hence, when we plot out the stationary locations on the map (on 17 Jan, between 1900-2000), we are able to observe that Car ID 11 left the clothing store at 19:46, which matched up to the suspicious transaction time. Hence, it can be implied that the owner of Car ID 11 might hold CC 1321 and L4149.
+
+```{r}
+POI_sf$hour = hour(POI_sf$Timestamp)
+
+POI_clothing <- POI_sf %>%
+  filter(day == 17 & hour == 19)
+tmap_mode("view")
+
+tm_shape(bgmap) +
+  tm_rgb(bgmap, r = 1,g = 2,b = 3,
+       alpha = NA,
+       saturation = 1,
+       interpolate = TRUE,
+       max.value = 255) +
+  tm_shape(POI_clothing) +
+  tm_dots(col = "blue")
+```
+
+
+Similarly, we can see that the dubious transaction at Chostus Hotel occurred on 18 Jan at 12:03. The credit card in question is 5010, tied to a loyalty card L2459.
+
+```{r}
+knitr::kable(spending_by_location %>%
+               filter(location %in% "Chostus Hotel") %>%
+               filter(price %in% max(price)) %>%
+               dplyr::select(location, timestamp, date, hour, price, median_price, last4ccnum, loyaltynum), 
+             caption = "Transactions made in Chostus Hotel")
+```
+
+Plotting the stationary points on the map, we can see that Car ID 31 left the hotel at 12:35, which matches up with the transaction data. Hence, it is implied that the owner of Car ID 31 might be the holder of CC 5010. 
+
+```{r}
+POI_hotel <- POI_sf %>%
+  filter(day == 18 & hour == 12)
+tmap_mode("view")
+
+tm_shape(bgmap) +
+  tm_rgb(bgmap, r = 1,g = 2,b = 3,
+       alpha = NA,
+       saturation = 1,
+       interpolate = TRUE,
+       max.value = 255) +
+  tm_shape(POI_hotel) +
+  tm_dots(col = "blue")
+
+```
