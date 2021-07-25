@@ -116,7 +116,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   <!--/radix_placeholder_rmarkdown_metadata-->
   
   <script type="text/json" id="radix-resource-manifest">
-  {"type":"NULL"}
+  {"type":"character","attributes":{},"value":["assignment-1_files/anchor-4.2.2/anchor.min.js","assignment-1_files/bowser-1.9.3/bowser.min.js","assignment-1_files/distill-2.2.21/template.v2.js","assignment-1_files/figure-html5/unnamed-chunk-10-1.png","assignment-1_files/figure-html5/unnamed-chunk-11-1.png","assignment-1_files/figure-html5/unnamed-chunk-12-1.png","assignment-1_files/figure-html5/unnamed-chunk-8-1.png","assignment-1_files/figure-html5/unnamed-chunk-9-1.png","assignment-1_files/header-attrs-2.9/header-attrs.js","assignment-1_files/jquery-1.11.3/jquery.min.js","assignment-1_files/popper-2.6.0/popper.min.js","assignment-1_files/tippy-6.2.7/tippy-bundle.umd.min.js","assignment-1_files/tippy-6.2.7/tippy-light-border.css","assignment-1_files/tippy-6.2.7/tippy.css","assignment-1_files/tippy-6.2.7/tippy.umd.min.js","assignment-1_files/webcomponents-2.0.0/webcomponents.js","data/car-assignments.csv","data/cc_data.csv","data/Geospatial/Abila.dbf","data/Geospatial/Abila.kml","data/Geospatial/Abila.prj","data/Geospatial/Abila.sbn","data/Geospatial/Abila.sbx","data/Geospatial/Abila.shp","data/Geospatial/Abila.shx","data/Geospatial/Kronos Island.kmz","data/Geospatial/Kronos_Island.dbf","data/Geospatial/Kronos_Island.prj","data/Geospatial/Kronos_Island.sbn","data/Geospatial/Kronos_Island.sbx","data/Geospatial/Kronos_Island.shp","data/Geospatial/Kronos_Island.shx","data/gps.csv","data/loyalty_data.csv","data/MC2-tourist.jpg","data/MC2-tourist.tif","data/MC2-tourist.tif.points","data/MC2_data_readme.docx"]}
   </script>
   <!--radix_placeholder_navigation_in_header-->
   <!--/radix_placeholder_navigation_in_header-->
@@ -1481,7 +1481,845 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <h2 id="introduction">Introduction</h2>
 <p>This Visual Analytics Assignment is based on the VAST Challenge 2021 Mini Challenge 2. The overview of the Challenge is about a Tethys-based GAStech that has been operating a natural gas production site in the island country og Kronos. Despite bringing in remarkable profits and developing strong relationships with the Kronos government, GAStech has not been as successful in demonstrating environmental stewardship.</p>
 <p>In January 2014, while the leaders of GAStech were celebrating their successful initial public offering (IPO), several of the company’s employees go missing. It is suspected that an organisation called the Protectors of Kronos (POK) was involved in the employees’ disappearance, but things may not be what they seem.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
+<h2 id="the-mini-challenge">The Mini Challenge</h2>
+<p>Mini Challenge 2 is about analysing the movement and tracking data of the GAStech employees, as well as their card card transactions and loyalty card usage data. From which, any anomalies and suspicious behaviours of the GAStech employees will be identified and analysed.</p>
+<h2 id="literature-reviews">Literature Reviews</h2>
+<p>Here.</p>
+<h2 id="data-sources">Data Sources</h2>
+<p>The data sources used in the mini challenge are:</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Data sources</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>car-assignments.csv</td>
+<td>List of vehicle assignments by employee</td>
+</tr>
+<tr class="even">
+<td>Geospatial folder</td>
+<td>ESRI shapefiles of Abila and Kronos</td>
+</tr>
+<tr class="odd">
+<td>gps.csv</td>
+<td>Vehicle tracking data</td>
+</tr>
+<tr class="even">
+<td>loyalty_data.csv</td>
+<td>Loyalty card transaction data</td>
+</tr>
+<tr class="odd">
+<td>cc_data.csv</td>
+<td>Credit and debit card transaction data</td>
+</tr>
+<tr class="even">
+<td>MC2-Tourist.jpg</td>
+<td>Tourist map of Abila with locations of interest identified</td>
+</tr>
+</tbody>
+</table>
+<h2 id="r-packages-used">R Packages Used</h2>
+<p>Below are the list of R packages installed and used in this assignment.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>packages</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>'raster'</span>, <span class='st'>'sf'</span>, <span class='st'>'tmap'</span>, <span class='st'>'lubridate'</span>, 
+             <span class='st'>'tidyverse'</span>, <span class='st'>'igraph'</span>, <span class='st'>'tidygraph'</span>, 
+             <span class='st'>'ggraph'</span>, <span class='st'>'visNetwork'</span>, <span class='st'>'clock'</span>,
+             <span class='st'>'DT'</span>, <span class='st'>'zoo'</span>, <span class='st'>'parcoords'</span><span class='op'>)</span>
+<span class='kw'>for</span> <span class='op'>(</span><span class='va'>p</span> <span class='kw'>in</span> <span class='va'>packages</span><span class='op'>)</span><span class='op'>{</span>
+  <span class='kw'>if</span><span class='op'>(</span><span class='op'>!</span><span class='kw'><a href='https://rdrr.io/r/base/library.html'>require</a></span><span class='op'>(</span><span class='va'>p</span>, character.only <span class='op'>=</span> <span class='cn'>T</span><span class='op'>)</span><span class='op'>)</span><span class='op'>{</span>
+    <span class='fu'><a href='https://rdrr.io/r/utils/install.packages.html'>install.packages</a></span><span class='op'>(</span><span class='va'>p</span><span class='op'>)</span>
+  <span class='op'>}</span>
+  <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>p</span>, character.only <span class='op'>=</span> <span class='cn'>T</span><span class='op'>)</span>
+<span class='op'>}</span>
+</code></pre>
+</div>
+</div>
+<h2 id="location-analysis">Location Analysis</h2>
+<h3 id="data-preparation">Data Preparation</h3>
+<p>The credit card and loyalty card csv files are first loaded into R.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>cc_data</span> <span class='op'>&lt;-</span> <span class='fu'>read_csv</span><span class='op'>(</span><span class='st'>"./data/cc_data.csv"</span><span class='op'>)</span>
+<span class='va'>loyalty_data</span> <span class='op'>&lt;-</span> <span class='fu'>read_csv</span><span class='op'>(</span><span class='st'>"./data/loyalty_data.csv"</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<p>Taking a look at the two datasets, we can observe that the <em>timestamp</em>, <em>location</em> and <em>loyaltynum</em> are in character field while <em>price</em> and <em>last4ccnum</em> are in numerical field. It is to be noted that the <em>timestamp</em> field should be in date-time format.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>glimpse</span><span class='op'>(</span><span class='va'>cc_data</span><span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code>Rows: 1,490
+Columns: 4
+$ timestamp  &lt;chr&gt; &quot;1/6/2014 7:28&quot;, &quot;1/6/2014 7:34&quot;, &quot;1/6/2014 7:35&quot;~
+$ location   &lt;chr&gt; &quot;Brew&#39;ve Been Served&quot;, &quot;Hallowed Grounds&quot;, &quot;Brew&#39;~
+$ price      &lt;dbl&gt; 11.34, 52.22, 8.33, 16.72, 4.24, 4.17, 28.73, 9.6~
+$ last4ccnum &lt;dbl&gt; 4795, 7108, 6816, 9617, 7384, 5368, 7253, 4948, 9~</code></pre>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>glimpse</span><span class='op'>(</span><span class='va'>loyalty_data</span><span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code>Rows: 1,392
+Columns: 4
+$ timestamp  &lt;chr&gt; &quot;1/6/2014&quot;, &quot;1/6/2014&quot;, &quot;1/6/2014&quot;, &quot;1/6/2014&quot;, &quot;~
+$ location   &lt;chr&gt; &quot;Brew&#39;ve Been Served&quot;, &quot;Brew&#39;ve Been Served&quot;, &quot;Ha~
+$ price      &lt;dbl&gt; 4.17, 9.60, 16.53, 11.51, 12.93, 4.27, 11.20, 15.~
+$ loyaltynum &lt;chr&gt; &quot;L2247&quot;, &quot;L9406&quot;, &quot;L8328&quot;, &quot;L6417&quot;, &quot;L1107&quot;, &quot;L40~</code></pre>
+</div>
+<p>Therefore, we need to convert the <em>timestamp</em> field in both datasets from character type to date-time type.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>cc_data</span><span class='op'>$</span><span class='va'>timestamp</span> <span class='op'>&lt;-</span> <span class='fu'>date_time_parse</span><span class='op'>(</span><span class='va'>cc_data</span><span class='op'>$</span><span class='va'>timestamp</span>,
+                                     zone <span class='op'>=</span> <span class='st'>""</span>,
+                                     format <span class='op'>=</span> <span class='st'>"%m/%d/%Y %H:%M"</span><span class='op'>)</span>
+
+<span class='va'>loyalty_data</span><span class='op'>$</span><span class='va'>timestamp</span> <span class='op'>&lt;-</span> <span class='fu'>date_time_parse</span><span class='op'>(</span><span class='va'>loyalty_data</span><span class='op'>$</span><span class='va'>timestamp</span>,
+                                          zone <span class='op'>=</span> <span class='st'>""</span>,
+                                          format <span class='op'>=</span> <span class='st'>"%m/%d/%Y"</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<p>Now, all the fields are in their correct data type.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>glimpse</span><span class='op'>(</span><span class='va'>cc_data</span><span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code>Rows: 1,490
+Columns: 4
+$ timestamp  &lt;dttm&gt; 2014-01-06 07:28:00, 2014-01-06 07:34:00, 2014-0~
+$ location   &lt;chr&gt; &quot;Brew&#39;ve Been Served&quot;, &quot;Hallowed Grounds&quot;, &quot;Brew&#39;~
+$ price      &lt;dbl&gt; 11.34, 52.22, 8.33, 16.72, 4.24, 4.17, 28.73, 9.6~
+$ last4ccnum &lt;dbl&gt; 4795, 7108, 6816, 9617, 7384, 5368, 7253, 4948, 9~</code></pre>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>glimpse</span><span class='op'>(</span><span class='va'>loyalty_data</span><span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code>Rows: 1,392
+Columns: 4
+$ timestamp  &lt;dttm&gt; 2014-01-06, 2014-01-06, 2014-01-06, 2014-01-06, ~
+$ location   &lt;chr&gt; &quot;Brew&#39;ve Been Served&quot;, &quot;Brew&#39;ve Been Served&quot;, &quot;Ha~
+$ price      &lt;dbl&gt; 4.17, 9.60, 16.53, 11.51, 12.93, 4.27, 11.20, 15.~
+$ loyaltynum &lt;chr&gt; &quot;L2247&quot;, &quot;L9406&quot;, &quot;L8328&quot;, &quot;L6417&quot;, &quot;L1107&quot;, &quot;L40~</code></pre>
+</div>
+<p>In order to have a better understanding and visualisation on how the credit card and loyalty card usage are related, we would need to join both datasets together.</p>
+<p>First, it is noted that the <em>timestamp</em> column in the <em>cc_data</em> dataset has both dates and time, while the <em>timestamp</em> column in the <em>loyalty_data</em> dataset only has the date field. So, we need to extract out the <em>date</em> from the <em>timestamp</em> column of the <em>cc_data</em>.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>cc_data</span><span class='op'>$</span><span class='va'>date</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/format.html'>format</a></span><span class='op'>(</span><span class='va'>cc_data</span><span class='op'>$</span><span class='va'>timestamp</span>, <span class='st'>"%m/%d/%Y"</span><span class='op'>)</span>
+<span class='va'>cc_data</span><span class='op'>$</span><span class='va'>date</span> <span class='op'>&lt;-</span> <span class='fu'>date_time_parse</span><span class='op'>(</span><span class='va'>cc_data</span><span class='op'>$</span><span class='va'>date</span>, 
+                                zone <span class='op'>=</span> <span class='st'>""</span>, 
+                                format <span class='op'>=</span> <span class='st'>"%m/%d/%Y"</span><span class='op'>)</span>
+
+<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>cc_data</span><span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code># A tibble: 6 x 5
+  timestamp           location    price last4ccnum date               
+  &lt;dttm&gt;              &lt;chr&gt;       &lt;dbl&gt;      &lt;dbl&gt; &lt;dttm&gt;             
+1 2014-01-06 07:28:00 Brew&#39;ve Be~ 11.3        4795 2014-01-06 00:00:00
+2 2014-01-06 07:34:00 Hallowed G~ 52.2        7108 2014-01-06 00:00:00
+3 2014-01-06 07:35:00 Brew&#39;ve Be~  8.33       6816 2014-01-06 00:00:00
+4 2014-01-06 07:36:00 Hallowed G~ 16.7        9617 2014-01-06 00:00:00
+5 2014-01-06 07:37:00 Brew&#39;ve Be~  4.24       7384 2014-01-06 00:00:00
+6 2014-01-06 07:38:00 Brew&#39;ve Be~  4.17       5368 2014-01-06 00:00:00</code></pre>
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span><span class='op'>(</span><span class='va'>loyalty_data</span><span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code># A tibble: 6 x 4
+  timestamp           location            price loyaltynum
+  &lt;dttm&gt;              &lt;chr&gt;               &lt;dbl&gt; &lt;chr&gt;     
+1 2014-01-06 00:00:00 Brew&#39;ve Been Served  4.17 L2247     
+2 2014-01-06 00:00:00 Brew&#39;ve Been Served  9.6  L9406     
+3 2014-01-06 00:00:00 Hallowed Grounds    16.5  L8328     
+4 2014-01-06 00:00:00 Coffee Shack        11.5  L6417     
+5 2014-01-06 00:00:00 Hallowed Grounds    12.9  L1107     
+6 2014-01-06 00:00:00 Brew&#39;ve Been Served  4.27 L4034     </code></pre>
+</div>
+<p>Now, we can join both datasets together by the <em>date</em>, <em>price</em> and <em>location</em>. A new column, <em>hour</em>, is added to take note of the time period the employee visited the location.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>cc_loyalty_data</span> <span class='op'>&lt;-</span> <span class='fu'>left_join</span><span class='op'>(</span><span class='va'>cc_data</span>, <span class='va'>loyalty_data</span>,
+                             by <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"date"</span> <span class='op'>=</span> <span class='st'>"timestamp"</span>,
+                                    <span class='st'>"location"</span> <span class='op'>=</span> <span class='st'>"location"</span>,
+                                    <span class='st'>"price"</span> <span class='op'>=</span> <span class='st'>"price"</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='va'>cc_loyalty_data</span><span class='op'>$</span><span class='va'>hour</span> <span class='op'>=</span> <span class='fu'>hour</span><span class='op'>(</span><span class='va'>cc_loyalty_data</span><span class='op'>$</span><span class='va'>timestamp</span><span class='op'>)</span>
+  
+<span class='fu'>glimpse</span><span class='op'>(</span><span class='va'>cc_loyalty_data</span><span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code>Rows: 1,496
+Columns: 7
+$ timestamp  &lt;dttm&gt; 2014-01-06 07:28:00, 2014-01-06 07:34:00, 2014-0~
+$ location   &lt;chr&gt; &quot;Brew&#39;ve Been Served&quot;, &quot;Hallowed Grounds&quot;, &quot;Brew&#39;~
+$ price      &lt;dbl&gt; 11.34, 52.22, 8.33, 16.72, 4.24, 4.17, 28.73, 9.6~
+$ last4ccnum &lt;dbl&gt; 4795, 7108, 6816, 9617, 7384, 5368, 7253, 4948, 9~
+$ date       &lt;dttm&gt; 2014-01-06, 2014-01-06, 2014-01-06, 2014-01-06, ~
+$ loyaltynum &lt;chr&gt; &quot;L8566&quot;, NA, &quot;L8148&quot;, &quot;L5553&quot;, &quot;L3800&quot;, &quot;L2247&quot;, ~
+$ hour       &lt;int&gt; 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7~</code></pre>
+</div>
+<h3 id="data-visualisation">Data Visualisation</h3>
+<p>Exploratory data analysis is conducted to determine the most popular locations frequented by the employees of GAStech.</p>
+<p>Looking at the combined dataset, we are able to observe that the top five most popular locations are:</p>
+<ol type="1">
+<li>Katerina’s Cafe</li>
+<li>Hippokampos</li>
+<li>Guy’s Gyros</li>
+<li>Brew’ve Been Served</li>
+<li>Hallowed Grounds</li>
+</ol>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>freq_by_location</span> <span class='op'>&lt;-</span> <span class='va'>cc_loyalty_data</span> <span class='op'>%&gt;%</span>
+  <span class='fu'>select</span><span class='op'>(</span><span class='va'>location</span>, <span class='va'>price</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'>group_by</span><span class='op'>(</span><span class='va'>location</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'>summarise</span><span class='op'>(</span>total_price <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='va'>price</span><span class='op'>)</span>, freq <span class='op'>=</span> <span class='fu'>n</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'>arrange</span><span class='op'>(</span><span class='fu'>desc</span><span class='op'>(</span><span class='va'>freq</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'>ungroup</span><span class='op'>(</span><span class='op'>)</span>
+
+<span class='fu'>ggplot</span><span class='op'>(</span>data<span class='op'>=</span><span class='va'>freq_by_location</span>,
+       <span class='fu'>aes</span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/reorder.factor.html'>reorder</a></span><span class='op'>(</span><span class='va'>location</span>, <span class='op'>-</span><span class='va'>freq</span><span class='op'>)</span>, y <span class='op'>=</span> <span class='va'>freq</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>geom_col</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>theme</span><span class='op'>(</span>axis.text.x <span class='op'>=</span> <span class='fu'>element_text</span><span class='op'>(</span>angle <span class='op'>=</span> <span class='fl'>90</span>,
+                                   hjust <span class='op'>=</span> <span class='fl'>1</span>,
+                                   vjust <span class='op'>=</span> <span class='fl'>0.5</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span> 
+  <span class='fu'>ggtitle</span><span class='op'>(</span><span class='st'>"Frequency of Visit"</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>labs</span><span class='op'>(</span>y <span class='op'>=</span> <span class='st'>"Frequency"</span>, x <span class='op'>=</span> <span class='st'>"Location"</span><span class='op'>)</span>
+</code></pre>
+</div>
+<p><img src="assignment-1_files/figure-html5/unnamed-chunk-8-1.png" width="624" /></p>
+</div>
+<p>Delving deeper into the top 5 most frequented places over the span of two weeks, we can plot a calendar heatmap to show the frequencies of purchases made at the top 5 most popular locations.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>freq_by_date</span> <span class='op'>&lt;-</span> <span class='va'>cc_loyalty_data</span> <span class='op'>%&gt;%</span>
+  <span class='fu'>select</span><span class='op'>(</span><span class='va'>date</span>, <span class='va'>hour</span>, <span class='va'>location</span>, <span class='va'>price</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'>group_by</span><span class='op'>(</span><span class='va'>date</span>, <span class='va'>hour</span>, <span class='va'>location</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'>summarise</span><span class='op'>(</span>total_price <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='va'>price</span><span class='op'>)</span>, freq <span class='op'>=</span> <span class='fu'>n</span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'>arrange</span><span class='op'>(</span><span class='fu'>desc</span><span class='op'>(</span><span class='va'>freq</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'>ungroup</span><span class='op'>(</span><span class='op'>)</span>
+
+<span class='va'>freq_by_date</span><span class='op'>$</span><span class='va'>weekday</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/as.POSIXlt.html'>as.POSIXlt</a></span><span class='op'>(</span><span class='va'>freq_by_date</span><span class='op'>$</span><span class='va'>date</span>, format <span class='op'>=</span> <span class='st'>"%d/%m/%Y"</span><span class='op'>)</span><span class='op'>$</span><span class='va'>wday</span>
+
+<span class='va'>freq_by_date</span><span class='op'>$</span><span class='va'>weekdayf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>factor</a></span><span class='op'>(</span><span class='va'>freq_by_date</span><span class='op'>$</span><span class='va'>weekday</span>, 
+                                levels <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rev.html'>rev</a></span><span class='op'>(</span><span class='fl'>0</span><span class='op'>:</span><span class='fl'>6</span><span class='op'>)</span>,
+                                labels <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rev.html'>rev</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Sun"</span>, <span class='st'>"Mon"</span>, <span class='st'>"Tue"</span>, <span class='st'>"Wed"</span>, <span class='st'>"Thu"</span>, <span class='st'>"Fri"</span>, <span class='st'>"Sat"</span><span class='op'>)</span><span class='op'>)</span>,
+                                ordered <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+
+<span class='va'>top5_plot</span> <span class='op'>&lt;-</span> <span class='va'>freq_by_date</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://rdrr.io/r/stats/na.fail.html'>na.omit</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://rdrr.io/r/stats/filter.html'>filter</a></span><span class='op'>(</span><span class='va'>location</span> <span class='op'>%in%</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Katerina's Cafe"</span>, <span class='st'>"Hippokampos"</span>, <span class='st'>"Guy's Gyros"</span>, <span class='st'>"Brew've Been Served"</span>, <span class='st'>"Hallowed Grounds"</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='va'>top5_heatmap</span> <span class='op'>&lt;-</span> <span class='fu'>ggplot</span><span class='op'>(</span><span class='va'>top5_plot</span>, <span class='fu'>aes</span><span class='op'>(</span><span class='va'>hour</span>, <span class='va'>weekdayf</span>, fill <span class='op'>=</span> <span class='va'>top5_plot</span><span class='op'>$</span><span class='va'>freq</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>geom_tile</span><span class='op'>(</span>colour <span class='op'>=</span> <span class='st'>"white"</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>facet_grid</span><span class='op'>(</span><span class='op'>~</span><span class='va'>location</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>theme</span><span class='op'>(</span>strip.text <span class='op'>=</span> <span class='fu'>element_text</span><span class='op'>(</span>size <span class='op'>=</span> <span class='fl'>7</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>scale_fill_distiller</span><span class='op'>(</span>palette <span class='op'>=</span> <span class='st'>"Reds"</span>, direction <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span> <span class='op'>+</span> 
+  <span class='fu'>xlab</span><span class='op'>(</span><span class='st'>"Hour"</span><span class='op'>)</span> <span class='op'>+</span> 
+  <span class='fu'><a href='https://rdrr.io/r/graphics/plot.window.html'>xlim</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>,<span class='fl'>23</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>ylab</span><span class='op'>(</span><span class='st'>"Day"</span><span class='op'>)</span> <span class='op'>+</span> 
+  <span class='fu'>ggtitle</span><span class='op'>(</span><span class='st'>"Calendar Heatmap: Transaction Volume at Top 5 Locations"</span><span class='op'>)</span> <span class='op'>+</span> 
+  <span class='fu'>labs</span><span class='op'>(</span>fill <span class='op'>=</span> <span class='st'>"Frequency"</span><span class='op'>)</span>
+
+<span class='va'>top5_heatmap</span>
+</code></pre>
+</div>
+<p><img src="assignment-1_files/figure-html5/unnamed-chunk-9-1.png" width="624" /></p>
+</div>
+<p>The following observations and insights can be derived from the calendar heatmap:</p>
+<ol type="1">
+<li>All 5 locations are possibly dining places located in Abila inferred from the time period the employees visited those locations.</li>
+<li>Brew’ve Been Served is a popular location during the weekdays around breakfast hours (0700-0800). Similarly, Hallowed Grounds is probably another popular breakfast place during the weekdays.</li>
+<li>Guy’s Gyros, Hippokampos and Katerina’s Cafe are popular lunch (1300-1400) and dinner (1900-2100) spots throughout the entire week.</li>
+</ol>
+<p>Moving on, two other calendar heatmaps are plotted to view the transaction volume comparison between weekdays and weekends.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>weekday_plot</span> <span class='op'>&lt;-</span> <span class='va'>freq_by_date</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://rdrr.io/r/stats/na.fail.html'>na.omit</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://rdrr.io/r/stats/filter.html'>filter</a></span><span class='op'>(</span><span class='va'>weekday</span> <span class='op'>%in%</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>5</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='va'>weekday_heatmap</span> <span class='op'>&lt;-</span> <span class='fu'>ggplot</span><span class='op'>(</span><span class='va'>weekday_plot</span>, <span class='fu'>aes</span><span class='op'>(</span><span class='va'>hour</span>, <span class='va'>location</span>, fill <span class='op'>=</span> <span class='va'>weekday_plot</span><span class='op'>$</span><span class='va'>freq</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>geom_tile</span><span class='op'>(</span>colour <span class='op'>=</span> <span class='st'>"white"</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>theme</span><span class='op'>(</span>strip.text <span class='op'>=</span> <span class='fu'>element_text</span><span class='op'>(</span>size <span class='op'>=</span> <span class='fl'>7</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>scale_fill_distiller</span><span class='op'>(</span>palette <span class='op'>=</span> <span class='st'>"Reds"</span>, direction <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span> <span class='op'>+</span> 
+  <span class='fu'>xlab</span><span class='op'>(</span><span class='st'>"Hour"</span><span class='op'>)</span> <span class='op'>+</span> 
+  <span class='fu'><a href='https://rdrr.io/r/graphics/plot.window.html'>xlim</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>,<span class='fl'>23</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>ylab</span><span class='op'>(</span><span class='st'>"Location"</span><span class='op'>)</span> <span class='op'>+</span> 
+  <span class='fu'>ggtitle</span><span class='op'>(</span><span class='st'>"Calendar Heatmap: Transaction Volume during Weekdays"</span><span class='op'>)</span> <span class='op'>+</span> 
+  <span class='fu'>labs</span><span class='op'>(</span>fill <span class='op'>=</span> <span class='st'>"Frequency"</span><span class='op'>)</span>
+
+<span class='va'>weekday_heatmap</span>
+</code></pre>
+</div>
+<p><img src="assignment-1_files/figure-html5/unnamed-chunk-10-1.png" width="624" /></p>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>weekend_plot</span> <span class='op'>&lt;-</span> <span class='va'>freq_by_date</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://rdrr.io/r/stats/na.fail.html'>na.omit</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://rdrr.io/r/stats/filter.html'>filter</a></span><span class='op'>(</span><span class='va'>weekday</span> <span class='op'>%in%</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>,<span class='fl'>6</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='va'>weekend_heatmap</span> <span class='op'>&lt;-</span> <span class='fu'>ggplot</span><span class='op'>(</span><span class='va'>weekend_plot</span>, <span class='fu'>aes</span><span class='op'>(</span><span class='va'>hour</span>, <span class='va'>location</span>, fill <span class='op'>=</span> <span class='va'>weekend_plot</span><span class='op'>$</span><span class='va'>freq</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>geom_tile</span><span class='op'>(</span>colour <span class='op'>=</span> <span class='st'>"white"</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>theme</span><span class='op'>(</span>strip.text <span class='op'>=</span> <span class='fu'>element_text</span><span class='op'>(</span>size <span class='op'>=</span> <span class='fl'>7</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>scale_fill_distiller</span><span class='op'>(</span>palette <span class='op'>=</span> <span class='st'>"Reds"</span>, direction <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span> <span class='op'>+</span> 
+  <span class='fu'>xlab</span><span class='op'>(</span><span class='st'>"Hour"</span><span class='op'>)</span> <span class='op'>+</span> 
+  <span class='fu'><a href='https://rdrr.io/r/graphics/plot.window.html'>xlim</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>,<span class='fl'>23</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>  
+  <span class='fu'>ylab</span><span class='op'>(</span><span class='st'>"Location"</span><span class='op'>)</span> <span class='op'>+</span> 
+  <span class='fu'>ggtitle</span><span class='op'>(</span><span class='st'>"Calendar Heatmap: Transaction Volume during Weekends"</span><span class='op'>)</span> <span class='op'>+</span> 
+  <span class='fu'>labs</span><span class='op'>(</span>fill <span class='op'>=</span> <span class='st'>"Frequency"</span><span class='op'>)</span>
+
+<span class='va'>weekend_heatmap</span>
+</code></pre>
+</div>
+<p><img src="assignment-1_files/figure-html5/unnamed-chunk-11-1.png" width="624" /></p>
+</div>
+<p>A boxplot show the spread of the transaction amount made by GAStech employees at different locations.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>median_price</span> <span class='op'>&lt;-</span> <span class='va'>cc_loyalty_data</span> <span class='op'>%&gt;%</span>
+  <span class='fu'>group_by</span><span class='op'>(</span><span class='va'>location</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'>summarise</span><span class='op'>(</span>median_price <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/median.html'>median</a></span><span class='op'>(</span><span class='va'>price</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='va'>spending_by_location</span> <span class='op'>&lt;-</span> <span class='va'>cc_loyalty_data</span> <span class='op'>%&gt;%</span>
+  <span class='fu'>left_join</span><span class='op'>(</span><span class='va'>median_price</span>, 
+            by <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"location"</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='fu'>ggplot</span><span class='op'>(</span>data <span class='op'>=</span> <span class='va'>spending_by_location</span>,
+       <span class='fu'>aes</span><span class='op'>(</span>x <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/reorder.factor.html'>reorder</a></span><span class='op'>(</span><span class='va'>location</span>, <span class='op'>-</span><span class='va'>median_price</span><span class='op'>)</span>, y <span class='op'>=</span> <span class='va'>price</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>geom_boxplot</span><span class='op'>(</span>outlier.colour <span class='op'>=</span> <span class='st'>"Red"</span>, outlier.fill <span class='op'>=</span> <span class='st'>"Red"</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>geom_point</span><span class='op'>(</span>alpha <span class='op'>=</span> <span class='fl'>0</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>scale_y_log10</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>theme</span><span class='op'>(</span>axis.text.x <span class='op'>=</span> <span class='fu'>element_text</span><span class='op'>(</span>angle <span class='op'>=</span> <span class='fl'>90</span>,
+                                   hjust <span class='op'>=</span> <span class='fl'>1</span>,
+                                   vjust <span class='op'>=</span> <span class='fl'>0.5</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span> 
+  <span class='fu'>ggtitle</span><span class='op'>(</span><span class='st'>"Transaction Amount by Location"</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>labs</span><span class='op'>(</span>y <span class='op'>=</span> <span class='st'>"Spending amount"</span>, x <span class='op'>=</span> <span class='st'>"Location"</span><span class='op'>)</span>
+</code></pre>
+</div>
+<p><img src="assignment-1_files/figure-html5/unnamed-chunk-12-1.png" width="624" /></p>
+</div>
+<p>Based on the above plots, we are able to spot a few anormalies that are note-worthy.</p>
+<ol type="1">
+<li>Kronos Mart</li>
+</ol>
+<p>From both the weekday and weekend calendar maps plotted above, there are transactions occurring at that location at the wee hours, when most people would be asleep. Further analysis revealed that there are a total of 5 transactions occurring on 3 different days (12 Jan, 13 Jan and 19 Jan) around 0300-0400 time period. The 5 transactions are all carried out on different credit cards, with no loyalty card used. It is also suspicious that the last two transactions occurred within the span of three minutes, suggesting a likely possibility that the last two card owners might have seen each other in the mart.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>knitr</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/knitr/man/kable.html'>kable</a></span><span class='op'>(</span><span class='va'>cc_loyalty_data</span> <span class='op'>%&gt;%</span>
+               <span class='fu'><a href='https://rdrr.io/r/stats/filter.html'>filter</a></span><span class='op'>(</span><span class='va'>location</span> <span class='op'>%in%</span> <span class='st'>"Kronos Mart"</span> <span class='op'>&amp;</span> <span class='va'>hour</span> <span class='op'>%in%</span> <span class='fl'>3</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+               <span class='fu'>dplyr</span><span class='fu'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span><span class='op'>(</span><span class='va'>location</span>, <span class='va'>timestamp</span>, <span class='va'>date</span>, <span class='va'>hour</span>, <span class='va'>price</span>, <span class='va'>last4ccnum</span>, <span class='va'>loyaltynum</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+               <span class='fu'>arrange</span><span class='op'>(</span><span class='va'>hour</span><span class='op'>)</span>, <span class='st'>"simple"</span>,
+             caption <span class='op'>=</span> <span class='st'>"Transactions made in Kronos Mart"</span><span class='op'>)</span>
+</code></pre>
+</div>
+<table>
+<caption><span id="tab:unnamed-chunk-13">Table 1: </span>Transactions made in Kronos Mart</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">location</th>
+<th style="text-align: left;">timestamp</th>
+<th style="text-align: left;">date</th>
+<th style="text-align: right;">hour</th>
+<th style="text-align: right;">price</th>
+<th style="text-align: right;">last4ccnum</th>
+<th style="text-align: left;">loyaltynum</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Kronos Mart</td>
+<td style="text-align: left;">2014-01-12 03:39:00</td>
+<td style="text-align: left;">2014-01-12</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">277.26</td>
+<td style="text-align: right;">8156</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Kronos Mart</td>
+<td style="text-align: left;">2014-01-13 03:00:00</td>
+<td style="text-align: left;">2014-01-13</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">147.30</td>
+<td style="text-align: right;">5407</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Kronos Mart</td>
+<td style="text-align: left;">2014-01-19 03:13:00</td>
+<td style="text-align: left;">2014-01-19</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">87.66</td>
+<td style="text-align: right;">3484</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Kronos Mart</td>
+<td style="text-align: left;">2014-01-19 03:45:00</td>
+<td style="text-align: left;">2014-01-19</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">194.51</td>
+<td style="text-align: right;">9551</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Kronos Mart</td>
+<td style="text-align: left;">2014-01-19 03:48:00</td>
+<td style="text-align: left;">2014-01-19</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">150.36</td>
+<td style="text-align: right;">8332</td>
+<td style="text-align: left;">NA</td>
+</tr>
+</tbody>
+</table>
+</div>
+<ol start="2" type="1">
+<li>Frydos Autosupply n’ More</li>
+</ol>
+<p>Based on the boxplot plotted above, we are able to identify an outlier transaction at Frydos Autosupply n’ More. There is an exceptionally high transaction of 10,000 dollars at the store where the median price is 149.30 dollars. Similarly, this transaction was not tagged to any loyalty card.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>knitr</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/knitr/man/kable.html'>kable</a></span><span class='op'>(</span><span class='va'>spending_by_location</span> <span class='op'>%&gt;%</span>
+               <span class='fu'><a href='https://rdrr.io/r/stats/filter.html'>filter</a></span><span class='op'>(</span><span class='va'>location</span> <span class='op'>%in%</span> <span class='st'>"Frydos Autosupply n' More"</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+               <span class='fu'><a href='https://rdrr.io/r/stats/filter.html'>filter</a></span><span class='op'>(</span><span class='va'>price</span> <span class='op'>%in%</span> <span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>max</a></span><span class='op'>(</span><span class='va'>price</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+               <span class='fu'>dplyr</span><span class='fu'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span><span class='op'>(</span><span class='va'>location</span>, <span class='va'>timestamp</span>, <span class='va'>date</span>, <span class='va'>hour</span>, <span class='va'>price</span>, <span class='va'>median_price</span>, <span class='va'>last4ccnum</span>, <span class='va'>loyaltynum</span><span class='op'>)</span>,
+             caption <span class='op'>=</span> <span class='st'>"Transactions made in Frydos Autosupply n' More"</span><span class='op'>)</span>
+</code></pre>
+</div>
+<table>
+<caption><span id="tab:unnamed-chunk-14">Table 2: </span>Transactions made in Frydos Autosupply n’ More</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">location</th>
+<th style="text-align: left;">timestamp</th>
+<th style="text-align: left;">date</th>
+<th style="text-align: right;">hour</th>
+<th style="text-align: right;">price</th>
+<th style="text-align: right;">median_price</th>
+<th style="text-align: right;">last4ccnum</th>
+<th style="text-align: left;">loyaltynum</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Frydos Autosupply n’ More</td>
+<td style="text-align: left;">2014-01-13 19:20:00</td>
+<td style="text-align: left;">2014-01-13</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">10000</td>
+<td style="text-align: right;">149.3</td>
+<td style="text-align: right;">9551</td>
+<td style="text-align: left;">NA</td>
+</tr>
+</tbody>
+</table>
+</div>
+<ol start="3" type="1">
+<li>Daily Dealz</li>
+</ol>
+<p>Despite being a low transaction amount, this purchase is rather suspicious as that is not tied to any loyalty card. The maximum, median and minimum transaction amounts also seem to be the same value, suggesting that it could be a singular purchase. This also means that not many people make purchases from Daily Dealz over the span of two weeks. Further analysis confirmed the suspicion. Furthermore, the credit card used to make the purchase is same as the credit card used to make the hefty purchase at Frydos Autosupply n’ More. The timing where the transaction occurred is also rather suspicious as it is an early morning purchase.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>knitr</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/knitr/man/kable.html'>kable</a></span><span class='op'>(</span><span class='va'>spending_by_location</span> <span class='op'>%&gt;%</span>
+               <span class='fu'><a href='https://rdrr.io/r/stats/filter.html'>filter</a></span><span class='op'>(</span><span class='va'>location</span> <span class='op'>%in%</span> <span class='st'>"Daily Dealz"</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+               <span class='fu'>dplyr</span><span class='fu'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span><span class='op'>(</span><span class='va'>location</span>, <span class='va'>timestamp</span>, <span class='va'>date</span>, <span class='va'>hour</span>, <span class='va'>price</span>, <span class='va'>last4ccnum</span>, <span class='va'>loyaltynum</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+               <span class='fu'>arrange</span><span class='op'>(</span><span class='va'>hour</span><span class='op'>)</span>, <span class='st'>"simple"</span>,
+             caption <span class='op'>=</span> <span class='st'>"Transactions made in Daily Dealz"</span><span class='op'>)</span>
+</code></pre>
+</div>
+<table>
+<caption><span id="tab:unnamed-chunk-15">Table 3: </span>Transactions made in Daily Dealz</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">location</th>
+<th style="text-align: left;">timestamp</th>
+<th style="text-align: left;">date</th>
+<th style="text-align: right;">hour</th>
+<th style="text-align: right;">price</th>
+<th style="text-align: right;">last4ccnum</th>
+<th style="text-align: left;">loyaltynum</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Daily Dealz</td>
+<td style="text-align: left;">2014-01-13 06:04:00</td>
+<td style="text-align: left;">2014-01-13</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">2.01</td>
+<td style="text-align: right;">9551</td>
+<td style="text-align: left;">NA</td>
+</tr>
+</tbody>
+</table>
+</div>
+<ol start="4" type="1">
+<li>Albert’s Fine Clothing</li>
+</ol>
+<p>Based on the boxplot plotted above, we are able to identify an outlier transaction at Albert’s Fine Clothing. There is large transaction of 1,239.41 dollars compared to the median spending amount of 211.47 dollars.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>knitr</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/knitr/man/kable.html'>kable</a></span><span class='op'>(</span><span class='va'>spending_by_location</span> <span class='op'>%&gt;%</span>
+               <span class='fu'><a href='https://rdrr.io/r/stats/filter.html'>filter</a></span><span class='op'>(</span><span class='va'>location</span> <span class='op'>%in%</span> <span class='st'>"Albert's Fine Clothing"</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+               <span class='fu'><a href='https://rdrr.io/r/stats/filter.html'>filter</a></span><span class='op'>(</span><span class='va'>price</span> <span class='op'>%in%</span> <span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>max</a></span><span class='op'>(</span><span class='va'>price</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+               <span class='fu'>dplyr</span><span class='fu'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span><span class='op'>(</span><span class='va'>location</span>, <span class='va'>timestamp</span>, <span class='va'>date</span>, <span class='va'>hour</span>, <span class='va'>price</span>, <span class='va'>median_price</span>, <span class='va'>last4ccnum</span>, <span class='va'>loyaltynum</span><span class='op'>)</span>, 
+             caption <span class='op'>=</span> <span class='st'>"Transactions made in Albert's Fine Clothing"</span><span class='op'>)</span>
+</code></pre>
+</div>
+<table style="width:100%;">
+<caption><span id="tab:unnamed-chunk-16">Table 4: </span>Transactions made in Albert’s Fine Clothing</caption>
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 19%" />
+<col style="width: 10%" />
+<col style="width: 4%" />
+<col style="width: 7%" />
+<col style="width: 12%" />
+<col style="width: 10%" />
+<col style="width: 10%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">location</th>
+<th style="text-align: left;">timestamp</th>
+<th style="text-align: left;">date</th>
+<th style="text-align: right;">hour</th>
+<th style="text-align: right;">price</th>
+<th style="text-align: right;">median_price</th>
+<th style="text-align: right;">last4ccnum</th>
+<th style="text-align: left;">loyaltynum</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Albert’s Fine Clothing</td>
+<td style="text-align: left;">2014-01-17 19:44:00</td>
+<td style="text-align: left;">2014-01-17</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">1239.41</td>
+<td style="text-align: right;">211.47</td>
+<td style="text-align: right;">1321</td>
+<td style="text-align: left;">L4149</td>
+</tr>
+</tbody>
+</table>
+</div>
+<ol start="5" type="1">
+<li>Chostus Hotel</li>
+</ol>
+<p>Based on the boxplot plotted above, we are able to identify an outlier transaction at Chostus Hotel. There is a higher than average transaction of 600 dollars compared to the median spending amount of 114.22 dollars.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>knitr</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/knitr/man/kable.html'>kable</a></span><span class='op'>(</span><span class='va'>spending_by_location</span> <span class='op'>%&gt;%</span>
+               <span class='fu'><a href='https://rdrr.io/r/stats/filter.html'>filter</a></span><span class='op'>(</span><span class='va'>location</span> <span class='op'>%in%</span> <span class='st'>"Chostus Hotel"</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+               <span class='fu'><a href='https://rdrr.io/r/stats/filter.html'>filter</a></span><span class='op'>(</span><span class='va'>price</span> <span class='op'>%in%</span> <span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>max</a></span><span class='op'>(</span><span class='va'>price</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+               <span class='fu'>dplyr</span><span class='fu'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span><span class='op'>(</span><span class='va'>location</span>, <span class='va'>timestamp</span>, <span class='va'>date</span>, <span class='va'>hour</span>, <span class='va'>price</span>, <span class='va'>median_price</span>, <span class='va'>last4ccnum</span>, <span class='va'>loyaltynum</span><span class='op'>)</span>, 
+             caption <span class='op'>=</span> <span class='st'>"Transactions made in Chostus Hotel"</span><span class='op'>)</span>
+</code></pre>
+</div>
+<table>
+<caption><span id="tab:unnamed-chunk-17">Table 5: </span>Transactions made in Chostus Hotel</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">location</th>
+<th style="text-align: left;">timestamp</th>
+<th style="text-align: left;">date</th>
+<th style="text-align: right;">hour</th>
+<th style="text-align: right;">price</th>
+<th style="text-align: right;">median_price</th>
+<th style="text-align: right;">last4ccnum</th>
+<th style="text-align: left;">loyaltynum</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Chostus Hotel</td>
+<td style="text-align: left;">2014-01-18 12:03:00</td>
+<td style="text-align: left;">2014-01-18</td>
+<td style="text-align: right;">12</td>
+<td style="text-align: right;">600</td>
+<td style="text-align: right;">114.22</td>
+<td style="text-align: right;">5010</td>
+<td style="text-align: left;">L2459</td>
+</tr>
+</tbody>
+</table>
+</div>
+<ol start="6" type="1">
+<li>Credit Card Number 9551</li>
+</ol>
+<p>This credit card is highly suspicious due to the fact that it is used in three of the alleged suspicious transactions pointed out above at Kronos Mart, Frydos Autosupply n’ More and Daily Dealz. Upon inspection of the card transaction detail, we can see that the card owner does have a loyalty card, but it seems like they tend to selectively use their loyalty card for discounts.</p>
+<p>Another dubious point to note is that for the first week, they use their credit card daily but during the next week, there are gaps in the transactions. Especially after 13 Jan (Mon), the credit card user stopped using their card for a few days before making transactions on 16 Jan (Thu).</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>cc_loyalty_data</span><span class='op'>$</span><span class='va'>weekday</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/as.POSIXlt.html'>as.POSIXlt</a></span><span class='op'>(</span><span class='va'>cc_loyalty_data</span><span class='op'>$</span><span class='va'>date</span>, format <span class='op'>=</span> <span class='st'>"%d/%m/%Y"</span><span class='op'>)</span><span class='op'>$</span><span class='va'>wday</span>
+
+<span class='va'>cc_loyalty_data</span><span class='op'>$</span><span class='va'>weekdayf</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>factor</a></span><span class='op'>(</span><span class='va'>cc_loyalty_data</span><span class='op'>$</span><span class='va'>weekday</span>, 
+                                levels <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rev.html'>rev</a></span><span class='op'>(</span><span class='fl'>0</span><span class='op'>:</span><span class='fl'>6</span><span class='op'>)</span>,
+                                labels <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rev.html'>rev</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Sun"</span>, <span class='st'>"Mon"</span>, <span class='st'>"Tue"</span>, <span class='st'>"Wed"</span>, <span class='st'>"Thu"</span>, <span class='st'>"Fri"</span>, <span class='st'>"Sat"</span><span class='op'>)</span><span class='op'>)</span>,
+                                ordered <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+
+<span class='fu'>knitr</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/knitr/man/kable.html'>kable</a></span><span class='op'>(</span><span class='va'>cc_loyalty_data</span> <span class='op'>%&gt;%</span>
+               <span class='fu'><a href='https://rdrr.io/r/stats/filter.html'>filter</a></span><span class='op'>(</span><span class='va'>last4ccnum</span> <span class='op'>%in%</span> <span class='fl'>9551</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+               <span class='fu'>dplyr</span><span class='fu'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span><span class='op'>(</span><span class='va'>timestamp</span>, <span class='va'>weekdayf</span>, <span class='va'>location</span>, <span class='va'>price</span>, <span class='va'>last4ccnum</span>, <span class='va'>loyaltynum</span><span class='op'>)</span>, 
+             caption <span class='op'>=</span> <span class='st'>"Transactions made with CC 9551"</span><span class='op'>)</span>
+</code></pre>
+</div>
+<table>
+<caption><span id="tab:unnamed-chunk-18">Table 6: </span>Transactions made with CC 9551</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">timestamp</th>
+<th style="text-align: left;">weekdayf</th>
+<th style="text-align: left;">location</th>
+<th style="text-align: right;">price</th>
+<th style="text-align: right;">last4ccnum</th>
+<th style="text-align: left;">loyaltynum</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">2014-01-06 07:55:00</td>
+<td style="text-align: left;">Mon</td>
+<td style="text-align: left;">Hallowed Grounds</td>
+<td style="text-align: right;">8.05</td>
+<td style="text-align: right;">9551</td>
+<td style="text-align: left;">L5777</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2014-01-06 13:21:00</td>
+<td style="text-align: left;">Mon</td>
+<td style="text-align: left;">Hippokampos</td>
+<td style="text-align: right;">28.23</td>
+<td style="text-align: right;">9551</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2014-01-06 20:26:00</td>
+<td style="text-align: left;">Mon</td>
+<td style="text-align: left;">Albert’s Fine Clothing</td>
+<td style="text-align: right;">276.90</td>
+<td style="text-align: right;">9551</td>
+<td style="text-align: left;">L5777</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2014-01-07 07:46:00</td>
+<td style="text-align: left;">Tue</td>
+<td style="text-align: left;">Hallowed Grounds</td>
+<td style="text-align: right;">84.44</td>
+<td style="text-align: right;">9551</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2014-01-07 13:37:00</td>
+<td style="text-align: left;">Tue</td>
+<td style="text-align: left;">Gelatogalore</td>
+<td style="text-align: right;">21.52</td>
+<td style="text-align: right;">9551</td>
+<td style="text-align: left;">L5777</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2014-01-08 07:56:00</td>
+<td style="text-align: left;">Wed</td>
+<td style="text-align: left;">Hallowed Grounds</td>
+<td style="text-align: right;">12.86</td>
+<td style="text-align: right;">9551</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2014-01-08 13:43:00</td>
+<td style="text-align: left;">Wed</td>
+<td style="text-align: left;">Hippokampos</td>
+<td style="text-align: right;">39.80</td>
+<td style="text-align: right;">9551</td>
+<td style="text-align: left;">L5777</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2014-01-08 21:16:00</td>
+<td style="text-align: left;">Wed</td>
+<td style="text-align: left;">Ouzeri Elian</td>
+<td style="text-align: right;">30.81</td>
+<td style="text-align: right;">9551</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2014-01-09 07:50:00</td>
+<td style="text-align: left;">Thu</td>
+<td style="text-align: left;">Hallowed Grounds</td>
+<td style="text-align: right;">34.45</td>
+<td style="text-align: right;">9551</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2014-01-09 13:41:00</td>
+<td style="text-align: left;">Thu</td>
+<td style="text-align: left;">Abila Zacharo</td>
+<td style="text-align: right;">89.41</td>
+<td style="text-align: right;">9551</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2014-01-10 13:16:00</td>
+<td style="text-align: left;">Fri</td>
+<td style="text-align: left;">Ouzeri Elian</td>
+<td style="text-align: right;">30.71</td>
+<td style="text-align: right;">9551</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2014-01-11 13:37:00</td>
+<td style="text-align: left;">Sat</td>
+<td style="text-align: left;">Hippokampos</td>
+<td style="text-align: right;">75.62</td>
+<td style="text-align: right;">9551</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2014-01-11 19:44:00</td>
+<td style="text-align: left;">Sat</td>
+<td style="text-align: left;">Shoppers’ Delight</td>
+<td style="text-align: right;">149.20</td>
+<td style="text-align: right;">9551</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2014-01-12 14:06:00</td>
+<td style="text-align: left;">Sun</td>
+<td style="text-align: left;">Hippokampos</td>
+<td style="text-align: right;">71.99</td>
+<td style="text-align: right;">9551</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2014-01-13 06:04:00</td>
+<td style="text-align: left;">Mon</td>
+<td style="text-align: left;">Daily Dealz</td>
+<td style="text-align: right;">2.01</td>
+<td style="text-align: right;">9551</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2014-01-13 13:18:00</td>
+<td style="text-align: left;">Mon</td>
+<td style="text-align: left;">U-Pump</td>
+<td style="text-align: right;">55.25</td>
+<td style="text-align: right;">9551</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2014-01-13 13:28:00</td>
+<td style="text-align: left;">Mon</td>
+<td style="text-align: left;">Hippokampos</td>
+<td style="text-align: right;">30.51</td>
+<td style="text-align: right;">9551</td>
+<td style="text-align: left;">L5777</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2014-01-13 19:20:00</td>
+<td style="text-align: left;">Mon</td>
+<td style="text-align: left;">Frydos Autosupply n’ More</td>
+<td style="text-align: right;">10000.00</td>
+<td style="text-align: right;">9551</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2014-01-13 19:30:00</td>
+<td style="text-align: left;">Mon</td>
+<td style="text-align: left;">Ouzeri Elian</td>
+<td style="text-align: right;">28.75</td>
+<td style="text-align: right;">9551</td>
+<td style="text-align: left;">L5777</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2014-01-16 08:05:00</td>
+<td style="text-align: left;">Thu</td>
+<td style="text-align: left;">Hallowed Grounds</td>
+<td style="text-align: right;">12.19</td>
+<td style="text-align: right;">9551</td>
+<td style="text-align: left;">L5777</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2014-01-16 13:28:00</td>
+<td style="text-align: left;">Thu</td>
+<td style="text-align: left;">Guy’s Gyros</td>
+<td style="text-align: right;">10.27</td>
+<td style="text-align: right;">9551</td>
+<td style="text-align: left;">L5777</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2014-01-16 20:28:00</td>
+<td style="text-align: left;">Thu</td>
+<td style="text-align: left;">Ouzeri Elian</td>
+<td style="text-align: right;">9.91</td>
+<td style="text-align: right;">9551</td>
+<td style="text-align: left;">L5777</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2014-01-17 08:04:00</td>
+<td style="text-align: left;">Fri</td>
+<td style="text-align: left;">Hallowed Grounds</td>
+<td style="text-align: right;">9.40</td>
+<td style="text-align: right;">9551</td>
+<td style="text-align: left;">L5777</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2014-01-17 20:28:00</td>
+<td style="text-align: left;">Fri</td>
+<td style="text-align: left;">Ouzeri Elian</td>
+<td style="text-align: right;">35.81</td>
+<td style="text-align: right;">9551</td>
+<td style="text-align: left;">L5777</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2014-01-18 13:32:00</td>
+<td style="text-align: left;">Sat</td>
+<td style="text-align: left;">Abila Zacharo</td>
+<td style="text-align: right;">16.59</td>
+<td style="text-align: right;">9551</td>
+<td style="text-align: left;">L5777</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2014-01-18 19:26:00</td>
+<td style="text-align: left;">Sat</td>
+<td style="text-align: left;">Ouzeri Elian</td>
+<td style="text-align: right;">61.56</td>
+<td style="text-align: right;">9551</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2014-01-19 03:45:00</td>
+<td style="text-align: left;">Sun</td>
+<td style="text-align: left;">Kronos Mart</td>
+<td style="text-align: right;">194.51</td>
+<td style="text-align: right;">9551</td>
+<td style="text-align: left;">NA</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2014-01-19 19:49:00</td>
+<td style="text-align: left;">Sun</td>
+<td style="text-align: left;">Ouzeri Elian</td>
+<td style="text-align: right;">32.77</td>
+<td style="text-align: right;">9551</td>
+<td style="text-align: left;">NA</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->
 </div>
