@@ -1,5 +1,22 @@
 [
   {
+    "path": "posts/2021-07-25-assignment-1/",
+    "title": "Assignment: 2021 VAST Mini Challenge 2",
+    "description": "The Kronos Incident",
+    "author": [
+      {
+        "name": "Connie Xia",
+        "url": "https://example.com/conniexia"
+      }
+    ],
+    "date": "2021-07-25",
+    "categories": [],
+    "contents": "\r\nIntroduction\r\nThis Visual Analytics Assignment is based on the VAST Challenge 2021 Mini Challenge 2. The overview of the Challenge is about a Tethys-based GAStech that has been operating a natural gas production site in the island country og Kronos. Despite bringing in remarkable profits and developing strong relationships with the Kronos government, GAStech has not been as successful in demonstrating environmental stewardship.\r\nIn January 2014, while the leaders of GAStech were celebrating their successful initial public offering (IPO), several of the company’s employees go missing. It is suspected that an organisation called the Protectors of Kronos (POK) was involved in the employees’ disappearance, but things may not be what they seem.\r\n\r\n\r\n\r\n",
+    "preview": {},
+    "last_modified": "2021-07-25T18:30:44+08:00",
+    "input_file": "assignment-1.knit.md"
+  },
+  {
     "path": "posts/2021-06-18-dataviz-makeover-2/",
     "title": "DataViz Makeover 2",
     "description": "Interactive visualisation for Singapore's Merchandise Trade with its Trading Partners, 2011-2020",

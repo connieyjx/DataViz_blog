@@ -1,7 +1,7 @@
 ---
-title: "Assignment 1"
+title: "Assignment: 2021 VAST Mini Challenge 2"
 description: |
-  A short description of the post.
+  The Kronos Incident
 author:
   - name: Connie Xia
     url: https://example.com/conniexia
@@ -13,11 +13,16 @@ output:
 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(fig.retina = 3,
+                      echo = TRUE, 
+                      eval = TRUE,
+                      message = FALSE,
+                      warning = FALSE)
 ```
 
-Distill is a publication format for scientific and technical writing, native to the web.
+## Introduction
 
-Learn more about using Distill at <https://rstudio.github.io/distill>.
+This Visual Analytics Assignment is based on the VAST Challenge 2021 Mini Challenge 2. The overview of the Challenge is about a Tethys-based GAStech that has been operating a natural gas production site in the island country og Kronos. Despite bringing in remarkable profits and developing strong relationships with the Kronos government, GAStech has not been as successful in demonstrating environmental stewardship.
 
+In January 2014, while the leaders of GAStech were celebrating their successful initial public offering (IPO), several of the company's employees go missing. It is suspected that an organisation called the Protectors of Kronos (POK) was involved in the employees' disappearance, but things may not be what they seem. 
 
