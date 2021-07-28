@@ -409,23 +409,6 @@ gps_path <- gps_sf %>%
 glimpse(gps_path)
 ```
 
-The map below shows the movement data of all the cars and trucks on the 6th Jan as an example.
-
-```{r}
-gps_path_selected <- gps_path %>%
-  filter(day == 6)
-tmap_mode("view")
-tm_shape(bgmap) +
-  tm_rgb(bgmap, r = 1,g = 2,b = 3,
-       alpha = NA,
-       saturation = 1,
-       interpolate = TRUE,
-       max.value = 255) +
-  tm_shape(gps_path_selected) +
-  tm_lines() +
-  tm_facets(by = "id", ncol = 4)
-```
-
 Next, the stationary points of all cars over the span of 2 weeks is plotted on the map below with the blue dots. The car is deeemd to be stationary if it has stopped for more than 3 minutes.
 
 ```{r}
@@ -519,4 +502,4 @@ tm_shape(bgmap) +
 
 
 
-Continue to [Part 2](https://connie-xia.netlify.app/posts/2021-07-25-assignment-1/)
+Continue to [Part 2](https://connie-xia.netlify.app/posts/2021-07-28-assignment-1-part-2/)
