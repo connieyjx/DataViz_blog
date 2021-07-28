@@ -436,7 +436,7 @@ We are able to suspect that Elsa Orilla and Brand Tempestad might have a relatio
 
 Based on the analysis conducted above, we are able to point out several suspicious activities occurring. 
 
-1. 
+1. The $10,000 transaction at Frydos Autosupply n' More could be due to fraud as our analysis tells us that the credit card 9951 might have be stolen by another person to make that transaction. 
 
-
+2. The consistent late night transactions at Kronos Mart needs to be investigated.
 
