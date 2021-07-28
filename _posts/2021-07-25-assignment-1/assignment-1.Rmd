@@ -833,8 +833,22 @@ glimpse(geog)
 
 ```
 
-One location to identify 
+One location to identify for informal relationship will be the Chostus Hotel. 
+
+```{r}
+hotel <- geog %>% 
+  filter(poi == "Chostus Hotel") %>%
+  select( poi, Timestamp, id, LastName, FirstName, CurrentEmploymentTitle, CurrentEmploymentType)
+
+knitr::kable(hotel %>%
+               arrange(Timestamp),
+             caption = "Records in Chostus Hotel")
+```
+
+We are able to suspect that Elsa Orilla and Brand Tempestad might have a relationship going on between them, as the both of them has frequented the hotel on four separate days. 
 
 ## Evidence of Suspicious Activities
+
+Based on the analysis conducted above, we are able to point out several suspicious activities occurring. 
 
 1. 
